@@ -101,7 +101,12 @@ data throughout, not real-time (ALFRED) vintages.
 Dynare isn't packaged for Fedora, so local testing uses a throwaway
 Debian container via `podman` (rootless, no sudo needed), since
 Debian/Ubuntu package Dynare with working precompiled Octave bindings
-directly -- this also matches what the GitHub Actions workflow does.
+directly -- this broadly matches what the GitHub Actions workflow does,
+though the actual runner is Ubuntu (`ubuntu-latest`), not Debian bookworm
+-- close enough for the apt-based install, but the two distros pull in
+different JRE package versions (see "Known issues" below), so a fix
+validated only in this Debian container isn't guaranteed to carry over
+without checking.
 
 ```bash
 podman build -t output-gap-dynare - <<'EOF'
@@ -112,8 +117,12 @@ RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq 
 # The dynare package pulls in a JRE for unused xls/reporting features.
 # On some CPUs/runners its startup CPU-feature probing segfaults as soon
 # as Dynare's estimation code loads -- remove it, we don't need it.
+# Matched by glob, not a pinned version: the exact JRE differs by distro
+# (Debian bookworm here pulls openjdk-17-jre; Ubuntu 24.04, what the
+# actual GitHub Actions runner uses, pulls openjdk-21-jre instead -- see
+# "Known issues" below).
 RUN DEBIAN_FRONTEND=noninteractive apt-get remove -y -qq default-jre \
-    default-jre-headless openjdk-17-jre openjdk-17-jre-headless ant ant-optional \
+    default-jre-headless 'openjdk-*-jre*' ant ant-optional \
     && apt-get autoremove -y -qq && apt-get clean
 EOF
 
@@ -146,8 +155,15 @@ podman run --rm -v "$(pwd)/models:/work/models:Z" -v "$(pwd)/data:/work/data:Z" 
   (the nonlinear, levels version) have **not** been updated and are not
   currently used by the pipeline.
 - See "Local testing" above re: the Java/JVM segfault workaround --
-  it's not optional, `calib_smoother` reliably crashes without it in
-  this environment.
+  it's not optional, `calib_smoother` reliably crashes (SIGSEGV, exit
+  139) without it in this environment. The exact JRE package to remove
+  differs by distro -- Debian bookworm (the local podman container)
+  pulls `openjdk-17-jre`; Ubuntu 24.04 (the actual `ubuntu-latest`
+  GitHub Actions runner) pulls `openjdk-21-jre` instead. First deployed
+  with only the 17 variant listed, which segfaulted in CI despite
+  working locally; confirmed by reproducing the exact failure in a real
+  `ubuntu:24.04` container (2026-08-28) and fixed by matching the
+  removal with a glob (`'openjdk-*-jre*'`) instead of a pinned version.
 
 ## Not yet done (deploy later)
 

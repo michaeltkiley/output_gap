@@ -33,10 +33,15 @@ jobs:
       # features we don't use). On some runners/CPUs the JVM's own startup
       # CPU-feature probing segfaults as soon as Dynare's estimation code
       # is loaded -- confirmed locally. We don't need Java, so remove it.
+      # The exact JRE package tracks whatever's current on the runner's
+      # distro (openjdk-21-jre on Ubuntu 24.04 as of 2026-08, vs. the
+      # openjdk-17-jre a Debian bookworm container pulled in when this was
+      # first diagnosed -- confirmed by reproducing in a real ubuntu:24.04
+      # container) so match by glob rather than a pinned version.
       - name: Remove Java (works around a JVM/Dynare segfault, unused anyway)
         run: |
           sudo apt-get remove -y -qq default-jre default-jre-headless \
-            openjdk-17-jre openjdk-17-jre-headless ant ant-optional || true
+            'openjdk-*-jre*' ant ant-optional || true
           sudo apt-get autoremove -y -qq
 
       - name: Set up Python
