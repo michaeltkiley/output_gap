@@ -63,7 +63,7 @@ jobs:
       # hasn't been reproducible in local containers, so if it recurs we
       # want a backtrace + the runner's actual CPU flags rather than a
       # bare exit code to go on.
-      - name: Diagnostics: CPU info
+      - name: "Diagnostics: CPU info"
         run: |
           lscpu
           grep -m1 flags /proc/cpuinfo
