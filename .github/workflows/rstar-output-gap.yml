@@ -12,6 +12,9 @@ on:
       - 'rstar/scripts/**'
       - '.github/workflows/rstar-output-gap.yml'
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest

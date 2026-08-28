@@ -12,6 +12,9 @@ on:
       - 'edo/scripts/**'
       - '.github/workflows/edo-output-gap.yml'
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest

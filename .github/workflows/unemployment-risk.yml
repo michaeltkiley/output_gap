@@ -11,6 +11,9 @@ on:
       - 'unemployment_risk/scripts/**'
       - '.github/workflows/unemployment-risk.yml'
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
