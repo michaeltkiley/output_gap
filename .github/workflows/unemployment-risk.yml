@@ -44,7 +44,11 @@ jobs:
           git add unemployment_risk/data/fred.duckdb unemployment_risk/data/observables.csv \
                   unemployment_risk/data/estimates.json unemployment_risk/outputs/
           git diff --quiet --cached || git commit -m "Auto-update unemployment/recession risk estimates [skip ci]"
-          git push
+          for i in 1 2 3 4 5; do
+            git push && break
+            git fetch origin main
+            git rebase origin/main
+          done
 
       - name: Trigger resource_utilization rebuild
         env:

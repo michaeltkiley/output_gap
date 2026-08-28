@@ -67,7 +67,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add edo/data/fred.duckdb edo/outputs/
           git diff --quiet --cached || git commit -m "Auto-update EDO output gap estimate [skip ci]"
-          git push
+          for i in 1 2 3 4 5; do
+            git push && break
+            git fetch origin main
+            git rebase origin/main
+          done
 
       - name: Trigger resource_utilization rebuild
         env:
