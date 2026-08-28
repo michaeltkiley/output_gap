@@ -42,6 +42,16 @@ jobs:
             'openjdk-*-jre*' ant ant-optional || true
           sudo apt-get autoremove -y -qq
 
+      # See edo-output-gap.yml's identical step for the full story: the
+      # apt-installed JRE isn't the only Java on ubuntu-latest -- the
+      # runner image also ships pre-installed JDKs under /usr/lib/jvm/
+      # (unrelated to apt) that octave-io can reach via JAVA_HOME and
+      # crash loading (confirmed via backtrace in edo's identical install,
+      # 2026-08-28). rstar hasn't hit this yet, but the install is
+      # identical, so remove it here too rather than wait for it to.
+      - name: Remove pre-installed JDKs from the runner image
+        run: sudo rm -rf /usr/lib/jvm/*
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

@@ -164,6 +164,20 @@ podman run --rm -v "$(pwd)/models:/work/models:Z" -v "$(pwd)/data:/work/data:Z" 
   working locally; confirmed by reproducing the exact failure in a real
   `ubuntu:24.04` container (2026-08-28) and fixed by matching the
   removal with a glob (`'openjdk-*-jre*'`) instead of a pinned version.
+  That still wasn't the whole story: even with the apt-installed JRE
+  correctly removed, CI kept segfaulting. A `gdb`-captured backtrace
+  (2026-08-28) landed in `/usr/lib/jvm/temurin-17-jdk-amd64/lib/server/
+  libjvm.so`, `VM_Version::get_processor_features()` -- the exact same
+  JVM CPU-feature-probing crash, but from a **different Java entirely**:
+  `ubuntu-latest`'s runner image ships several pre-installed JDKs baked
+  into `/usr/lib/jvm/` for language-toolchain support, unrelated to and
+  untouched by `apt-get remove`. `octave-io` reaches for a system JVM
+  via `JAVA_HOME` regardless of apt state (for its xlsx/POI support) and
+  finds one of these. Not reproducible in a bare `ubuntu:24.04` podman
+  container locally, since that image doesn't have this runner toolcache
+  at all -- which is exactly why the apt-only fix looked sufficient
+  locally but wasn't in CI. Fixed by deleting `/usr/lib/jvm/*` outright
+  as a separate step, in addition to (not instead of) the apt removal.
 
 ## Not yet done (deploy later)
 

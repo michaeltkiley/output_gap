@@ -44,6 +44,22 @@ jobs:
             'openjdk-*-jre*' ant ant-optional || true
           sudo apt-get autoremove -y -qq
 
+      # The apt-installed JRE above isn't the only Java on this runner:
+      # ubuntu-latest's image ships several pre-installed JDKs baked in
+      # under /usr/lib/jvm/ (Temurin 17, 21, ...) for language-toolchain
+      # support, unrelated to apt. octave-io reaches for a system JVM via
+      # JAVA_HOME regardless of what apt has installed (for its xlsx/POI
+      # support) and finds one of these -- confirmed by an actual crash
+      # backtrace landing in .../temurin-17-jdk-amd64/lib/server/libjvm.so,
+      # VM_Version::get_processor_features() (2026-08-28): the same JVM
+      # CPU-feature-probing segfault as above, just a different JVM than
+      # the one being removed. Not reproducible in a bare ubuntu:24.04
+      # container locally, since that image doesn't have this runner
+      # toolcache at all. Delete the JDKs outright so there's nothing left
+      # for Octave to load.
+      - name: Remove pre-installed JDKs from the runner image
+        run: sudo rm -rf /usr/lib/jvm/*
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
