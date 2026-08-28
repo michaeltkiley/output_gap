@@ -1,0 +1,54 @@
+name: Update unemployment / recession risk
+
+on:
+  schedule:
+    # 13:17 UTC on the 10th of every month -- after the BIS credit/GDP
+    # series (the full5 model's laggard input) has had a chance to update.
+    - cron: '17 13 10 * *'
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'unemployment_risk/scripts/**'
+      - '.github/workflows/unemployment-risk.yml'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r unemployment_risk/requirements.txt
+
+      - name: Run pipeline
+        working-directory: unemployment_risk/scripts
+        run: |
+          python3 00_ingest_fred.py --force
+          python3 01_build_observables.py --force
+          python3 02_estimate.py --force
+          python3 03_export_results.py --force
+
+      - name: Commit updated outputs to this repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add unemployment_risk/data/fred.duckdb unemployment_risk/data/observables.csv \
+                  unemployment_risk/data/estimates.json unemployment_risk/outputs/
+          git diff --quiet --cached || git commit -m "Auto-update unemployment/recession risk estimates [skip ci]"
+          git push
+
+      - name: Trigger resource_utilization rebuild
+        env:
+          CROSS_REPO_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $CROSS_REPO_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/michaeltkiley/resource_utilization/dispatches \
+            -d '{"event_type":"unemployment-risk-updated"}'

@@ -1,0 +1,77 @@
+name: Update EDO output gap
+
+on:
+  schedule:
+    # 13:17 UTC on the 1st of every month (offset from the top of the hour
+    # to avoid GitHub's :00 scheduling congestion).
+    - cron: '17 13 1 * *'
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'edo/models/**'
+      - 'edo/scripts/**'
+      - '.github/workflows/edo-output-gap.yml'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Debian/Ubuntu package Dynare directly, with working precompiled
+      # Octave MEX bindings -- much simpler than building from source.
+      - name: Install Octave + Dynare
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq dynare octave octave-io
+
+      # The dynare apt package pulls in a JRE (for optional xls/reporting
+      # features we don't use). On some runners/CPUs the JVM's own startup
+      # CPU-feature probing segfaults as soon as Dynare's estimation code
+      # is loaded -- confirmed locally. We don't need Java, so remove it.
+      - name: Remove Java (works around a JVM/Dynare segfault, unused anyway)
+        run: |
+          sudo apt-get remove -y -qq default-jre default-jre-headless \
+            openjdk-17-jre openjdk-17-jre-headless ant ant-optional || true
+          sudo apt-get autoremove -y -qq
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install -r edo/scripts/requirements.txt
+
+      - name: Ingest FRED data
+        run: python3 edo/scripts/ingest_fred.py
+
+      - name: Build model observables
+        run: python3 edo/scripts/build_observables.py
+
+      - name: Run Dynare calib_smoother and export results
+        working-directory: edo/models
+        run: |
+          octave --no-gui --eval "
+            dynare linearized.mod noclearall;
+            run('../scripts/export_results.m');
+          "
+
+      - name: Commit updated outputs to this repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add edo/data/fred.duckdb edo/outputs/
+          git diff --quiet --cached || git commit -m "Auto-update EDO output gap estimate [skip ci]"
+          git push
+
+      - name: Trigger resource_utilization rebuild
+        env:
+          CROSS_REPO_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token $CROSS_REPO_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/michaeltkiley/resource_utilization/dispatches \
+            -d '{"event_type":"edo-updated"}'

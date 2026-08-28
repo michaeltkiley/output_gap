@@ -1,0 +1,14 @@
+{
+  "last_run": "2026-08-28T19:51:16Z",
+  "model": "rg_base_final",
+  "data_file": "../data/observables.csv",
+  "rff_mean": 6.071510,
+  "dp_mean": 3.548906,
+  "rstar_constant": 2.522604,
+  "rstar_constant_sample_start": "1960Q1",
+  "rstar_constant_sample_end": "2007Q4",
+  "sample_start": "1961Q1",
+  "sample_end": "2026Q2",
+  "series": ["rstar_2side", "rstar_2side_lower", "rstar_2side_upper", "rstar_1side", "output_gap_2side", "output_gap_2side_lower", "output_gap_2side_upper", "output_gap_1side", "unemployment_gap_2side", "unemployment_gap_1side", "trend_growth_2side", "trend_growth_1side"],
+  "files": ["rstar.csv"]
+}

@@ -1,0 +1,9 @@
+{
+  "last_run": "2026-08-28T13:17:09Z",
+  "model": "linearized_replication",
+  "data_file": "../data/observables_replication.csv",
+  "sample_start": "1984Q4",
+  "sample_end": "2026Q2",
+  "series": ["GAP", "PFGAP"],
+  "files": ["output_gap_replication.csv"]
+}

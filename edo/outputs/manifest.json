@@ -1,0 +1,9 @@
+{
+  "last_run": "2026-08-28T14:15:19Z",
+  "model": "linearized",
+  "data_file": "../data/observables.csv",
+  "sample_start": "1984Q4",
+  "sample_end": "2026Q2",
+  "series": ["GAP", "PFGAP"],
+  "files": ["output_gap.csv"]
+}
