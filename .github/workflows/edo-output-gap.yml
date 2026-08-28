@@ -58,13 +58,39 @@ jobs:
       - name: Build model observables
         run: python3 edo/scripts/build_observables.py
 
+      # Diagnostics only, in case the run segfaults below: the Java/JVM
+      # cause was ruled out (fixed 2026-08-28, still segfaults) and it
+      # hasn't been reproducible in local containers, so if it recurs we
+      # want a backtrace + the runner's actual CPU flags rather than a
+      # bare exit code to go on.
+      - name: Diagnostics: CPU info
+        run: |
+          lscpu
+          grep -m1 flags /proc/cpuinfo
+
+      - name: Install gdb (crash diagnostics only)
+        run: sudo apt-get install -y -qq gdb
+
       - name: Run Dynare calib_smoother and export results
         working-directory: edo/models
+        # OPENBLAS_NUM_THREADS/OMP_NUM_THREADS=1: GitHub-hosted runners have
+        # a known history of segfaults in threaded BLAS/LAPACK kernels on
+        # certain CPU types, worse for larger matrix operations -- edo's
+        # Kalman smoother (35 state variables) is far bigger than rstar's
+        # (15), which hasn't crashed with the same install. Forcing
+        # single-threaded BLAS is a cheap, well-precedented mitigation for
+        # exactly this failure signature.
+        env:
+          OPENBLAS_NUM_THREADS: 1
+          OMP_NUM_THREADS: 1
         run: |
-          octave --no-gui --eval "
+          ulimit -c unlimited
+          ulimit -s unlimited
+          gdb --batch -ex run -ex bt -ex quit --args octave --no-gui --eval "
             dynare linearized.mod noclearall;
             run('../scripts/export_results.m');
-          "
+          " 2>&1 | tee /tmp/octave_run.log
+          grep -q "Export complete" /tmp/octave_run.log
 
       - name: Commit updated outputs to this repo
         run: |
