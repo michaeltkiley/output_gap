@@ -40,12 +40,6 @@ Two model specs, both logit (magnitude is only computed for the full model):
   Note's first model. Shown alongside full5 for comparison -- how much do
   the macro variables (unemployment, inflation, credit) change the picture?
 
-The FEDS Note's third spec (financial + OECD composite leading indicator)
-is **not implemented**: FRED's OECD CLI series for the US
-(`USALOLITONOSTSAM`) stopped updating in January 2024, so it can't be kept
-current. Not worth building even as a replication-only artifact given it
-can't inform "current analysis" at all.
-
 ## Pipeline
 
 ```
@@ -146,15 +140,6 @@ block bootstrap -- block length 11 quarters, matching "Kilian and Lutkepohl
 (2017), chapter 12" in both papers' table notes -- resampling blocks of
 *all* variables (dependent + predictors) jointly to preserve the serial
 correlation induced by overlapping h-quarter-ahead horizons, then refitting
-each model per replication (500 reps). Not currently surfaced on the
-dashboard (only point estimates are, matching the FEDS Note's own headline
-charts) -- available in `data/estimates.json`/`data/estimates_replication.json`
-if wanted later.
-
-## What's not done
-
-- The OECD-leading-indicator spec (see above -- data can't be kept current).
-- Dashboard uncertainty bands for these series (unlike the rstar/UC gap's
-  ±2 SD band) -- not requested for this model yet.
-- A scheduled CI workflow (GitHub Actions) -- doesn't exist for this
-  project yet, matching rstar's own "not yet done."
+each model per replication (500 reps). The dashboard shows point
+estimates, matching the FEDS Note's own headline charts; full 90% CIs
+are in `data/estimates.json`/`data/estimates_replication.json`.

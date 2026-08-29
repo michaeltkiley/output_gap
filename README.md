@@ -4,9 +4,9 @@ Multiple structural approaches to estimating the U.S. output gap and the
 equilibrium real interest rate, each independently pipelined, feeding two
 public dashboards.
 
-This repo is the **private compute layer**: it holds the three models,
-runs each on its own schedule, and commits fresh outputs. It does not
-serve a webpage itself.
+This repo is the **compute layer**: it holds the three models, runs
+each on its own schedule, and commits fresh outputs. It does not serve
+a webpage itself.
 
 - **`edo/`** — the Federal Reserve Board's EDO model (Chung, Kiley &
   Laforte). Kalman-smooths current FRED data against fixed posterior-mode
@@ -39,8 +39,9 @@ shape -- each with its own `docs/index.html` served via GitHub Pages:
 - **`michaeltkiley/equilibrium_rate`** — reads `rstar/outputs/rstar.csv`
   from this repo, plus its own live FRED/Laubach-Williams/SPF ingests.
 
-Both are private-source, public-output: this repo is private (or at least
-not meant to be browsed), the two page repos are public.
+This repo holds the model internals and data pipelines; the two page
+repos only read its computed CSV outputs and don't carry any of the
+underlying estimation code.
 
 ## Deployment
 
@@ -68,8 +69,8 @@ tab) and re-run automatically on a `push` that touches their own
    repositories (`output_gap`, `resource_utilization`, `equilibrium_rate`)
    — Settings → Secrets and variables → Actions → New repository secret.
    - In `output_gap`, it's used to send the `repository_dispatch` calls.
-   - In the two page repos, it's used to `actions/checkout` this
-     (private) repo for its outputs.
+   - In the two page repos, it's used to `actions/checkout` this repo
+     for its outputs.
 3. In each of `resource_utilization` and `equilibrium_rate`: Settings →
    Pages → Source → Deploy from a branch → `main` / `/docs`.
 4. Push all three repos. The compute pipelines don't need to run

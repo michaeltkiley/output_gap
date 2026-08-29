@@ -87,7 +87,7 @@ just unnecessary for regular monitoring updates.
 each regular update**, not run with fixed parameters -- r* is understood
 to genuinely evolve, and re-optimizing the mode each time (rather than
 smoothing at fixed historical parameters) is standard practice for this
-literature. Not yet wired into a scheduled CI job.
+literature.
 
 ## Uncertainty
 
@@ -166,15 +166,3 @@ network, same situation EDO's original data construction was in), the
 frozen `rstardata.mat` this project's Hoey/BZW splice was extracted from,
 other stale point-in-time snapshots, and plotting scripts. Kept for
 reference/audit trail, not part of this project's pipeline.
-
-## Not yet done
-
-- Dynare-version compatibility review of `_mcmc`/`_robust1`/`_robust2.mod`
-  (only the base file has been run against modern Dynare so far -- it
-  needed no `_steadystate.m`-style fixes, unlike EDO, but the others
-  haven't been tested).
-- A scheduled CI workflow (GitHub Actions), matching `../edo/`'s.
-- A periodic full-MCMC job, if ever wanted for cross-checking the mode-only
-  results against the actual posterior distribution, or for a total
-  (state + parameter) uncertainty band rather than the filtering-only one
-  currently shown.

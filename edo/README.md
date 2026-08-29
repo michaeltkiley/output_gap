@@ -83,9 +83,7 @@ the `--replication` baseline.
 The `.mod` files ship with parameters already estimated (via MCMC) over
 1984:Q4-2011:Q4. Every scheduled run just re-smooths at those fixed
 values against updated data -- fast (~seconds), and avoids burning CI
-minutes on MCMC. Periodically re-estimating the parameters against the
-full extended sample is worth doing eventually, but as a separate,
-occasionally-run job, not part of the regular update -- not yet built.
+minutes on MCMC.
 
 ## Data
 
@@ -178,10 +176,3 @@ podman run --rm -v "$(pwd)/models:/work/models:Z" -v "$(pwd)/data:/work/data:Z" 
   at all -- which is exactly why the apt-only fix looked sufficient
   locally but wasn't in CI. Fixed by deleting `/usr/lib/jvm/*` outright
   as a separate step, in addition to (not instead of) the apt removal.
-
-## Not yet done (deploy later)
-
-- Wiring the `PAGES_REPO_TOKEN` secret and the webpage-repo
-  `repository_dispatch` trigger (commented out in the workflow).
-- A periodic re-estimation job.
-- Anything on the actual webpage/dashboard side.
