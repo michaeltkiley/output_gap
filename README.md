@@ -58,21 +58,3 @@ its own schedule, commits its outputs back to this repo, then fires a
 All three also support `workflow_dispatch` (manual run from the Actions
 tab) and re-run automatically on a `push` that touches their own
 `models/`/`scripts/` paths.
-
-### One-time setup
-
-1. Create a fine-grained (or classic) **personal access token** with
-   `repo`-level read access to `output_gap` and write/dispatch access to
-   `resource_utilization` and `equilibrium_rate`. A single classic PAT
-   with `repo` scope covers all three.
-2. Add it as a secret named **`CROSS_REPO_TOKEN`** in all three
-   repositories (`output_gap`, `resource_utilization`, `equilibrium_rate`)
-   — Settings → Secrets and variables → Actions → New repository secret.
-   - In `output_gap`, it's used to send the `repository_dispatch` calls.
-   - In the two page repos, it's used to `actions/checkout` this repo
-     for its outputs.
-3. In each of `resource_utilization` and `equilibrium_rate`: Settings →
-   Pages → Source → Deploy from a branch → `main` / `/docs`.
-4. Push all three repos. The compute pipelines don't need to run
-   immediately -- `workflow_dispatch` (Actions tab → workflow → "Run
-   workflow") triggers an on-demand first run of each.
