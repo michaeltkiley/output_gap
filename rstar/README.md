@@ -118,9 +118,9 @@ uncertainty measure for their estimates.
 ## Data notes
 
 - **Long-run inflation expectations (`ptr`)**: the frozen Hoey/Barclays
-  de Zoete Wedd Decision-Makers Poll splice (`scripts/hoey_bzw_ltinf_1960q1_1991q3.csv`,
-  extracted once from the original `rstardata.mat` and never refetched --
-  that survey is defunct) through 1991:Q3, then the Philadelphia Fed
+  de Zoete Wedd Decision-Makers Poll splice (`scripts/hoey_bzw_ltinf_1960q1_1991q3.csv` --
+  that survey is defunct, so this series is fixed, not refetched) through
+  1991:Q3, then the Philadelphia Fed
   SPF's median 10-year CPI forecast from 1991:Q4 on, fetched live each
   run. The two sources meet exactly at the boundary (both give
   1991:Q4 = 4.0). Genuinely missing quarters in the Hoey/BZW era are left
@@ -128,14 +128,14 @@ uncertainty measure for their estimates.
   observations natively.
 - **Sample start**: 1960:Q1, matching "My estimation sample spans from
   1960:Q1 to 2017:Q4" in the published paper.
-- **`dp` (core PCE inflation)**: cross-checked against `rstardata.mat`
-  and carries a modest (~0.2-0.3pp), non-systematic residual not fully
-  explained by data-vintage drift -- likely a differing quarterly-
-  averaging convention for a price index. Flagged in
-  `build_observables.py`'s docstring, not resolved.
+- **`dp` (core PCE inflation)**: cross-checked against the original
+  paper's own data and carries a modest (~0.2-0.3pp), non-systematic
+  residual not fully explained by data-vintage drift -- likely a
+  differing quarterly-averaging convention for a price index. Flagged
+  in `build_observables.py`'s docstring, not resolved.
 - **Data vintage**: latest-revised FRED data throughout, matching EDO's
-  choice (confirmed with the user 2026-08-28) -- not real-time (ALFRED)
-  vintages, despite `alfredgraph.csv`'s presence in the original package.
+  choice (confirmed with the user 2026-08-28), not real-time (ALFRED)
+  vintages.
 - **A real Octave gotcha, in case it recurs**: `strsplit(line, ',')`
   collapses consecutive delimiters by default, silently shifting every
   column after an empty field (`ptr` is frequently empty). Always pass
@@ -155,14 +155,3 @@ uncertainty measure for their estimates.
   original replication's `estimation(...)` command only listed
   `uU tr tg` for one-sided (filtered) output -- `yU` had to be added to
   that list to get a one-sided output gap at all.
-
-## What's in `models/` vs. `replication_src/`
-
-`models/` holds everything directly reusable from the original
-replication package (`rg_base_final*.mod`, the saved posterior mode
-`.mat`). `replication_src/` holds the rest: `data_create.m` (pulls from
-**FAME**, the Fed's internal database -- won't run outside the Fed
-network, same situation EDO's original data construction was in), the
-frozen `rstardata.mat` this project's Hoey/BZW splice was extracted from,
-other stale point-in-time snapshots, and plotting scripts. Kept for
-reference/audit trail, not part of this project's pipeline.

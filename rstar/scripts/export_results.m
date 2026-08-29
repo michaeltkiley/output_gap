@@ -79,9 +79,9 @@ fclose(fid);
 % for the current-analysis (live page) output only -- see the note at the
 % top of this file. Replication mode instead uses the full available
 % sample (every row in observables_replication.csv), closely matching
-% the original paper's own real-time convention in
-% replication_src/baseline_rstar_kiley.m (mean over ~1965:Q1 through the
-% run date, i.e. "as much history as exists at the time") -- switching
+% the original paper's own real-time convention (mean over ~1965:Q1
+% through the run date, i.e. "as much history as exists at the time") --
+% switching
 % replication to the fixed pre-crisis window too would break the
 % paper-verification check's fidelity to the paper's own published
 % numbers, which is the whole point of replication mode.
