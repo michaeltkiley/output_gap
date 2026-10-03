@@ -46,9 +46,9 @@ jobs:
           git diff --quiet --cached || git commit -m "Auto-update unemployment/recession risk estimates [skip ci]"
           for i in 1 2 3 4 5; do
             git push && break
-            git fetch origin main
-            git rebase origin/main
+            git pull --rebase --autostash origin main
           done
+          git push  # fails the step if every retry was rejected
 
       - name: Trigger resource_utilization rebuild
         env:
