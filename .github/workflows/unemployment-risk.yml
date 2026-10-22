@@ -11,6 +11,10 @@ on:
       - 'unemployment_risk/scripts/**'
       - '.github/workflows/unemployment-risk.yml'
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 

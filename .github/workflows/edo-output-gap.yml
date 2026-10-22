@@ -12,6 +12,10 @@ on:
       - 'edo/scripts/**'
       - '.github/workflows/edo-output-gap.yml'
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
