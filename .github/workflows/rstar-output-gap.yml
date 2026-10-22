@@ -12,6 +12,10 @@ on:
       - 'rstar/scripts/**'
       - '.github/workflows/rstar-output-gap.yml'
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
