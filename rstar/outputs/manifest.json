@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-10-03T14:45:40Z",
+  "last_run": "2026-11-01T18:29:36Z",
   "model": "rg_base_final",
   "data_file": "../data/observables.csv",
   "rff_mean": 6.071510,
@@ -8,7 +8,7 @@
   "rstar_constant_sample_start": "1960Q1",
   "rstar_constant_sample_end": "2007Q4",
   "sample_start": "1961Q1",
-  "sample_end": "2026Q2",
+  "sample_end": "2026Q3",
   "series": ["rstar_2side", "rstar_2side_lower", "rstar_2side_upper", "rstar_1side", "output_gap_2side", "output_gap_2side_lower", "output_gap_2side_upper", "output_gap_1side", "unemployment_gap_2side", "unemployment_gap_1side", "trend_growth_2side", "trend_growth_1side"],
   "files": ["rstar.csv"]
 }
